@@ -33,16 +33,16 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'           "插件管理
-"Plugin 'pangloss/vim-javascript.git'    "js高亮
-Plugin 'Valloric/YouCompleteMe'         "ycm
-Plugin 'kien/ctrlp.vim'                 "文件搜索，ctrl+p
-Plugin 'Yggdroot/LeaderF'               "模糊搜索，替代ctrlp
+Plugin 'VundleVim/Vundle.vim'           " 插件管理
+Plugin 'Valloric/YouCompleteMe'         " ycm
+Plugin 'kien/ctrlp.vim'                 " 文件搜索，ctrl+p
+Plugin 'Yggdroot/LeaderF'               " 模糊搜索，替代ctrlp
 Plugin 'inkarkat/vim-ingo-library'      " 
 Plugin 'inkarkat/vim-mark'              " dependent on vim-ingo-library. 多颜色高亮，mark插件增强版
 Plugin 'luochen1990/rainbow'            " 彩虹括号
-Plugin 'easymotion/vim-easymotion'      "移动光标插件
+Plugin 'easymotion/vim-easymotion'      " 移动光标插件
 Plugin 'thaerkh/vim-workspace'          " workspace
+Plugin 'scrooloose/nerdtree'            " 
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -91,7 +91,7 @@ fun! ShowFuncName()
   call search("\\%" . lnum . "l" . "\\%" . col . "c")
 endfun
 
-autocmd BufNewFile *.js,*.[ch],*.sh exec ":call SetTitle()" 
+autocmd BufNewFile *.js,*.[ch],*.sh,*.py exec ":call SetTitle()" 
 func! SetTitle() 
     if &filetype == 'sh' 
         call setline(1,"\#!/bin/bash")
@@ -101,7 +101,12 @@ func! SetTitle()
     if &filetype == 'javascript'
         call setline(1,"\"use strict\";")
         call append(line("."), "") 
+        call append(line("."), "")
+    endif
+    if &filetype == 'python'
+        call setline(1,"# -*- coding:utf-8 -*-")
         call append(line("."), "") 
+        call append(line("."), "")
     endif
 endfunc 
 "新建文件后，自动定位到文件末尾
@@ -122,17 +127,13 @@ let mapleader=","
 ",q 取消高亮
 map <leader>q :nohl<Cr>
 "\f显示函数名
-nnoremap <leader>f :call ShowFuncName() <CR>
+nnoremap <leader>a :call ShowFuncName() <CR>
 let mapleader="\\"
 
-"extra mark plug was loaded by vundle
-"source ~/.vim/bundle/simplemark/mark.vim
-
-"按语法自动折叠js，依赖vim-javascript插件
 set foldmethod=indent
-"au FileType javascript set foldmethod=syntax
 au FileType * normal zR
 au BufEnter * normal zR
+
 let g:rainbow_active = 1  "彩虹括号生效。和vim-js冲突 
 
 "移动半页, C-k与tmux冲突
@@ -157,7 +158,7 @@ let g:Lf_WildIgnore = {
         \}
 
 "ctrlp
-"让ctrlp使用ag, leaderf不忽略，ctrlp忽略
+"让ctrlp使用ag, leaderf重复了
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
 "好像不需要这些映射
@@ -179,8 +180,7 @@ if has("cscope")
   endif
   set csverb
 endif
-
-"cscope
+"set cscopequickfix=s-,c-,d-,i-,t-,e-
 let mapleader=","
 nmap <leader>s :cs find s <C-R>=expand("<cword>")<CR><CR>
 nmap <leader>g :cs find g <C-R>=expand("<cword>")<CR><CR>
@@ -190,12 +190,23 @@ nmap <leader>e :cs find e <C-R>=expand("<cword>")<CR><CR>
 nmap <leader>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <leader>i :cs find i <C-R>=expand("<cfile>")<CR><CR>
 nmap <leader>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+nmap <leader>x :cn<CR>
+nmap <leader>z :cp<CR>
 let mapleader="\\"
 
 
 "workspace
 nnoremap <leader>s :ToggleWorkspace<CR>
 let g:workspace_session_disable_on_args = 1
+
+"
+function! Offhlsyn()
+    set filetype=
+    set syntax=
+    syntax off
+endfunction
+nnoremap <F9> :call Offhlsyn()<CR>
 
 
 "search list
@@ -205,7 +216,7 @@ function! FindAll()
     call inputrestore()
     execute 'vimgrep "'.p.'" % |copen'
 endfunction
-nnoremap <F8> :call FindAll()<cr>
+nnoremap <F8> :call FindAll()<CR>
 
 
 if &term =~ '256color'
@@ -214,6 +225,12 @@ if &term =~ '256color'
   " see also http://snk.tuxfamily.org/log/vim-256color-bce.html
   set t_ut=
 endif
+
+"nerdtree
+map <F10> :NERDTreeToggle<CR>
+let NERDTreeQuitOnOpen=1
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
 
 
 
