@@ -42,7 +42,8 @@ Plugin 'inkarkat/vim-mark'              " dependent on vim-ingo-library. 多颜�
 Plugin 'luochen1990/rainbow'            " 彩虹括号
 Plugin 'easymotion/vim-easymotion'      " 移动光标插件
 Plugin 'thaerkh/vim-workspace'          " workspace
-Plugin 'scrooloose/nerdtree'            " 
+Plugin 'scrooloose/nerdtree'            " file tree
+Plugin 'dominikduda/vim_current_word'   " hilight current word and underline same word
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -130,9 +131,9 @@ map <leader>q :nohl<Cr>
 nnoremap <leader>a :call ShowFuncName() <CR>
 let mapleader="\\"
 
-set foldmethod=indent
-au FileType * normal zR
-au BufEnter * normal zR
+"set foldmethod=indent
+"au FileType * normal zR
+"au BufEnter * normal zR
 
 let g:rainbow_active = 1  "彩虹括号生效。和vim-js冲突 
 
@@ -166,7 +167,17 @@ let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 "imap <A-k> <Up>
 "imap <A-h> <Left>
 "imap <A-l> <Right>
-source ~/.vim/force.vim
+"强制习惯hjkl
+map <Left> <Nop>
+map <Right> <Nop>
+map <Up> <Nop>
+map <Down> <Nop>
+imap <Left> <Nop>
+imap <Right> <Nop>
+imap <Up> <Nop>
+imap <Down> <Nop>
+imap <BS> <Nop>
+imap <Del> <Nop>
 
 "cscope
 if has("cscope")
@@ -232,5 +243,7 @@ let NERDTreeQuitOnOpen=1
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 
-
+"current word color
+"hi CurrentWord ctermbg=53
+"hi CurrentWordTwins ctermbg=237
 
