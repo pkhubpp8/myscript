@@ -9,7 +9,7 @@ set shiftwidth=4 "缩进宽度
 set pastetoggle=<F11> 
 set nowrap  "不自动换行
 set laststatus=2     "显示状态栏
-set statusline=[%n][f=%F][hex=%B][%l/%L\ %c]
+set statusline=[%n][f=%F][%l/%L\ %c][hex=%B]
 "set mouse=a "支持鼠标，不太好用
 syntax on
 
@@ -44,6 +44,9 @@ Plugin 'easymotion/vim-easymotion'      " 移动光标插件
 Plugin 'thaerkh/vim-workspace'          " workspace
 Plugin 'scrooloose/nerdtree'            " file tree
 Plugin 'dominikduda/vim_current_word'   " hilight current word and underline same word
+Plugin 'fatih/vim-go'
+"Plugin 'Asheq/close-buffers.vim'
+Plugin 'schickling/vim-bufonly'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -98,13 +101,11 @@ func! SetTitle()
         call setline(1,"\#!/bin/bash")
         call append(line("."), "") 
         call append(line("."), "") 
-    endif
-    if &filetype == 'javascript'
+    elseif &filetype == 'javascript'
         call setline(1,"\"use strict\";")
         call append(line("."), "") 
         call append(line("."), "")
-    endif
-    if &filetype == 'python'
+    elseif &filetype == 'python'
         call setline(1,"# -*- coding:utf-8 -*-")
         call append(line("."), "") 
         call append(line("."), "")
@@ -113,10 +114,14 @@ endfunc
 "新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
 
-nnoremap <leader>r :call RunMocha() <CR>
-func! RunMocha()
-    exec "w"
-    exec "!./node_modules/.bin/mocha %"
+nnoremap <leader>r :call RunFile() <CR>
+func! RunFile()
+    exec "wa"
+    if &filetype == 'javascript'
+        exec "!./node_modules/.bin/mocha %"
+    elseif &filetype == 'go'
+        exec "GoRun"
+    endif
 endfunc
 nnoremap <leader>e :call RunEslint() <CR>
 func! RunEslint()
@@ -167,17 +172,7 @@ let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 "imap <A-k> <Up>
 "imap <A-h> <Left>
 "imap <A-l> <Right>
-"强制习惯hjkl
-map <Left> <Nop>
-map <Right> <Nop>
-map <Up> <Nop>
-map <Down> <Nop>
-imap <Left> <Nop>
-imap <Right> <Nop>
-imap <Up> <Nop>
-imap <Down> <Nop>
-imap <BS> <Nop>
-imap <Del> <Nop>
+"source ~/.vim/force.vim
 
 "cscope
 if has("cscope")
@@ -242,8 +237,7 @@ map <F10> :NERDTreeToggle<CR>
 let NERDTreeQuitOnOpen=1
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-
 "current word color
-"hi CurrentWord ctermbg=53
-"hi CurrentWordTwins ctermbg=237
+hi CurrentWord ctermbg=237 ctermfg=2
+hi CurrentWordTwins ctermbg=237 cterm=underline gui=underline ctermfg=117
 
