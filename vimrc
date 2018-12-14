@@ -10,7 +10,7 @@ set pastetoggle=<F11>
 set nowrap  "不自动换行
 set laststatus=2     "显示状态栏
 set statusline=[%n][f=%F][%l/%L\ %c][hex=%B]
-"set mouse=a "支持鼠标，不太好用
+"set mouse=a "鼠标
 syntax on
 
 set t_Co=256
@@ -81,7 +81,8 @@ let g:ycm_semantic_triggers =  {
             \   'haskell' : ['.', 're!.'],
             \   'css': [ 're!^\s{2,4}', 're!:\s+' ],
             \   'javascript': ['.', 're!(?=[a-zA-Z]{3,4})'],
-            \   'python': ['.']
+            \   'python': ['.'],
+            \   'go': ['.']
             \ }
 "颜色配置，适用ycm
 highlight Pmenu ctermfg=15 ctermbg=8 guifg=#ffffff guibg=#808080
@@ -117,15 +118,32 @@ autocmd BufNewFile * normal G
 nnoremap <leader>r :call RunFile() <CR>
 func! RunFile()
     exec "wa"
-    if &filetype == 'javascript'
-        exec "!./node_modules/.bin/mocha %"
+    if &filetype == 'vim'
+        echo "please source manually!"
+    elseif &filetype == 'javascript'
+        let icvalue = &l:ic
+        set noic
+        let fullpath = expand("%:p")
+        let matchp = match(fullpath, '\v(siteoam|racoam|nodeoam|oamagentjs)\/\1\/test\/.*(Test|Mocha)\.js$')
+        if icvalue == 1
+            set ic
+        else
+            set noic
+        endif
+        if matchp < 0
+            exec "!node %"
+        else
+            exec "!./node_modules/.bin/mocha %"
+        endif
     elseif &filetype == 'go'
         exec "GoRun"
     endif
+    return
 endfunc
+
 nnoremap <leader>e :call RunEslint() <CR>
 func! RunEslint()
-    exec "w"
+    exec "wa"
     exec "!./node_modules/.bin/eslint %"
 endfunc
 
@@ -241,3 +259,16 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 hi CurrentWord ctermbg=237 ctermfg=2
 hi CurrentWordTwins ctermbg=237 cterm=underline gui=underline ctermfg=117
 
+
+"tab
+" Go to tab by number
+noremap <leader>1 1gt
+noremap <leader>2 2gt
+noremap <leader>3 3gt
+noremap <leader>4 4gt
+noremap <leader>5 5gt
+noremap <leader>6 6gt
+noremap <leader>7 7gt
+noremap <leader>8 8gt
+noremap <leader>9 9gt
+noremap <leader>0 :tablast<cr>
