@@ -9,15 +9,17 @@ set shiftwidth=4 "缩进宽度
 set pastetoggle=<F11> 
 set nowrap  "不自动换行
 set laststatus=2     "显示状态栏
-set statusline=[%n][f=%F][%l/%L\ %c][hex=%B]
+set statusline=[%n][%F][%l/%L\ %c][hex=%B]
+set scrolloff=3    "距离3行时就开始滚动
 "set mouse=a "鼠标
 syntax on
-
+set shell=/bin/bash\ --login
 set t_Co=256
 hi Search term=reverse ctermfg=154 ctermbg=8 guibg=#808080 guifg=#af00ff
 hi Visual term=reverse ctermfg=0 ctermbg=15 guibg=#ffffff guifg=#000000
 hi SpellBad term=reverse ctermfg=0 ctermbg=7 guibg=#c0c0c0 guifg=#000000
 hi MatchParen term=reverse ctermfg=0 ctermbg=14 guibg=#00ffff guifg=#000000
+highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=DarkBlue gui=bold,reverse guifg=DarkBlue
 highlight Comment ctermfg=lightblue
 
 match Todo /\vREADME:/
@@ -44,9 +46,12 @@ Plugin 'easymotion/vim-easymotion'      " 移动光标插件
 Plugin 'thaerkh/vim-workspace'          " workspace
 Plugin 'scrooloose/nerdtree'            " file tree
 Plugin 'dominikduda/vim_current_word'   " hilight current word and underline same word
-Plugin 'fatih/vim-go'
+Plugin 'fatih/vim-go'                   " auto complete golang
 "Plugin 'Asheq/close-buffers.vim'
-Plugin 'schickling/vim-bufonly'
+Plugin 'schickling/vim-bufonly'         " bonly close other buff
+Plugin 'mkitt/tabline.vim'              " show tabline index
+"Plugin 'scrooloose/vim-slumlord'
+"Plugin 'aklt/plantuml-syntax'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -65,6 +70,7 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
 let g:ycm_key_list_select_completion = ['<Tab>', '<C-j>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
+let g:ycm_max_diagnostics_to_display = 0
 let g:ycm_semantic_triggers =  {
             \   'c' : ['->', '.'],
             \   'objc' : ['->', '.'],
@@ -124,7 +130,7 @@ func! RunFile()
         let icvalue = &l:ic
         set noic
         let fullpath = expand("%:p")
-        let matchp = match(fullpath, '\v(siteoam|racoam|nodeoam|oamagentjs)\/\1\/test\/.*(Test|Mocha)\.js$')
+        let matchp = match(fullpath, '\v(siteoam|racoam|nodeoam|oamagentjs|fault-manager)\/\1\/test\/.*(Test|Mocha)\.js$')
         if icvalue == 1
             set ic
         else
@@ -144,7 +150,11 @@ endfunc
 nnoremap <leader>e :call RunEslint() <CR>
 func! RunEslint()
     exec "wa"
-    exec "!./node_modules/.bin/eslint %"
+    if &filetype == 'javascript'
+        exec "!./node_modules/.bin/eslint %"
+    else
+        echo "no eslint for this file"
+    endif
 endfunc
 
 let mapleader=","
@@ -186,10 +196,10 @@ let g:Lf_WildIgnore = {
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
 "好像不需要这些映射
-"imap <A-j> <Down>
-"imap <A-k> <Up>
-"imap <A-h> <Left>
-"imap <A-l> <Right>
+imap <A-j> <Down>
+imap <A-k> <Up>
+imap <A-h> <Left>
+imap <A-l> <Right>
 "source ~/.vim/force.vim
 
 "cscope
@@ -225,12 +235,17 @@ nnoremap <leader>s :ToggleWorkspace<CR>
 let g:workspace_session_disable_on_args = 1
 
 "
-function! Offhlsyn()
-    set filetype=
-    set syntax=
-    syntax off
+function! Switchhlsyn()
+    let answer = confirm('Off syntax?', "&Yes\n&No", 1)
+    if answer == 1
+        syntax off
+    else
+        syntax on
+        redraw
+        echo "input error"
+    endif
 endfunction
-nnoremap <F9> :call Offhlsyn()<CR>
+nnoremap <F9> :call Switchhlsyn()<CR>
 
 
 "search list
@@ -272,3 +287,27 @@ noremap <leader>7 7gt
 noremap <leader>8 8gt
 noremap <leader>9 9gt
 noremap <leader>0 :tablast<cr>
+hi TabLineSel   ctermfg=White  ctermbg=Blue cterm=NONE
+
+" $ 好麻烦啊
+map 9 $
+
+
+
+"second search way
+function! UseGrepFind()
+    call inputsave()
+    let p = input('dir search.Enter pattern:')
+    let searchdir = input('dir:')
+    if searchdir == ""
+        let searchdir = "./src"
+    endif
+    call inputrestore()
+    execute 'grep! -nrE "'.p.'" "'.searchdir.'"'
+    execute 'copen'
+endfunction
+nnoremap <F7> :call UseGrepFind()<CR><CR>
+
+
+noremap <leader>c :BOnly<CR>
+
