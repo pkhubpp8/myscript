@@ -6,7 +6,7 @@ set ic          "忽略大小写
 set nu          "显示行号
 set noswapfile  "没有交换文件
 set shiftwidth=4 "缩进宽度
-set pastetoggle=<F11> 
+set pastetoggle=<F11>
 set nowrap  "不自动换行
 set laststatus=2     "显示状态栏
 set statusline=[%n][%F][%l/%L\ %c][hex=%B]
@@ -23,6 +23,8 @@ highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=DarkBlue gui=b
 highlight Comment ctermfg=lightblue
 
 match Todo /\vREADME:/
+match Error /\s\+$/
+autocmd FileType c,cpp,python,vim,javascript autocmd BufWritePre <buffer> :%s/\s\+$//e
 
 "打开文件回到上次位置
 if has("autocmd")
@@ -39,7 +41,7 @@ Plugin 'VundleVim/Vundle.vim'           " 插件管理
 Plugin 'Valloric/YouCompleteMe'         " ycm
 Plugin 'kien/ctrlp.vim'                 " 文件搜索，ctrl+p
 Plugin 'Yggdroot/LeaderF'               " 模糊搜索，替代ctrlp
-Plugin 'inkarkat/vim-ingo-library'      " 
+Plugin 'inkarkat/vim-ingo-library'      "
 Plugin 'inkarkat/vim-mark'              " dependent on vim-ingo-library. 多颜色高亮，mark插件增强版
 Plugin 'luochen1990/rainbow'            " 彩虹括号
 Plugin 'easymotion/vim-easymotion'      " 移动光标插件
@@ -102,22 +104,22 @@ fun! ShowFuncName()
   call search("\\%" . lnum . "l" . "\\%" . col . "c")
 endfun
 
-autocmd BufNewFile *.js,*.[ch],*.sh,*.py exec ":call SetTitle()" 
-func! SetTitle() 
-    if &filetype == 'sh' 
+autocmd BufNewFile *.js,*.[ch],*.sh,*.py exec ":call SetTitle()"
+func! SetTitle()
+    if &filetype == 'sh'
         call setline(1,"\#!/bin/bash")
-        call append(line("."), "") 
-        call append(line("."), "") 
+        call append(line("."), "")
+        call append(line("."), "")
     elseif &filetype == 'javascript'
         call setline(1,"\"use strict\";")
-        call append(line("."), "") 
+        call append(line("."), "")
         call append(line("."), "")
     elseif &filetype == 'python'
         call setline(1,"# -*- coding:utf-8 -*-")
-        call append(line("."), "") 
+        call append(line("."), "")
         call append(line("."), "")
     endif
-endfunc 
+endfunc
 "新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
 
@@ -168,7 +170,7 @@ let mapleader="\\"
 "au FileType * normal zR
 "au BufEnter * normal zR
 
-let g:rainbow_active = 1  "彩虹括号生效。和vim-js冲突 
+let g:rainbow_active = 1  "彩虹括号生效。和vim-js冲突
 
 "移动半页, C-k与tmux冲突
 nmap <C-j> <C-d>
@@ -245,7 +247,6 @@ function! Switchhlsyn()
         echo "input error"
     endif
 endfunction
-nnoremap <F9> :call Switchhlsyn()<CR>
 
 
 "search list
@@ -255,7 +256,6 @@ function! FindAll()
     call inputrestore()
     execute 'vimgrep "'.p.'" % |copen'
 endfunction
-nnoremap <F8> :call FindAll()<CR>
 
 
 if &term =~ '256color'
@@ -293,6 +293,11 @@ hi TabLineSel   ctermfg=White  ctermbg=Blue cterm=NONE
 map 9 $
 
 
+"second current filename
+function! SearchCurrentName()
+    execute 'grep! '.expand("%:t:r").' ./src -nwr'
+    execute 'copen'
+endfunction
 
 "second search way
 function! UseGrepFind()
@@ -306,8 +311,15 @@ function! UseGrepFind()
     execute 'grep! -nrE "'.p.'" "'.searchdir.'"'
     execute 'copen'
 endfunction
+
+nnoremap <F6> :call SearchCurrentName()<CR><CR>
 nnoremap <F7> :call UseGrepFind()<CR><CR>
+nnoremap <F8> :call FindAll()<CR>
+nnoremap <F9> :call Switchhlsyn()<CR>
 
 
 noremap <leader>c :BOnly<CR>
+
+let g:python_recommended_style = 0
+autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
 
