@@ -1,0 +1,7 @@
+tmux kill-window -t 0   //kill 0th window
+tmux rename-window racoam  //rename current window to "racoam"
+
+
+
+ctrl+g  ctrl+E :send command to all pane
+
