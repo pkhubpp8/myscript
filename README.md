@@ -1,9 +1,10 @@
-# myvimrc
-
-modify leader in plugin/mark.vim
+# vim
+因为本身脚本和mark插件有按键冲突
+插件安装完需要修改plugin/mark.vim的前导键
 for example:
-let mapleader="," at first
-and let mapleader="\\" at end
+let mapleader=","   "文件开始
+let mapleader="\\"  "文件结束
+某些插件可能会安装不上/用处不大
 
 
 
