@@ -25,3 +25,11 @@ gitbash大小，颜色的配置
 以及记不住的tmux命令的note
 
 
+
+# bash
+inputrc
+忽略大小写
+上下键自动搜索历史
+
+# vscode
+常用键位、插件设定
