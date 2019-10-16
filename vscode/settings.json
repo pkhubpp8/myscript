@@ -1,0 +1,58 @@
+{
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "terminal.integrated.shellArgs.windows": [
+        "-l"
+    ],
+    "git.ignoreLegacyWarning": true,
+    "C_Cpp.updateChannel": "Insiders",
+
+    "files.exclude" : {
+        "Makefile": true,
+        "*.d": true,
+        "*.o": true,
+        "*.so": true,
+        "*.mk": true,
+        "*.pc": true
+    },
+    "search.exclude" : {
+        "**/CMakeLists.txt": true,
+        "**/Makefile": true,
+        "**/cscope*": true,
+        "**/*.d": true,
+        "**/*.o": true,
+        "**/*.so": true,
+        "**/*.conf": true,
+        "**/*.mk": true,
+        "**/*.xml": true,
+        "**/*.txt": true,
+        "**/*.rst": true,
+        "**/*.pc": true,
+        "**/build/*": true,
+        "**/rootfs/*": true,
+        "**/bb_capacity/*": true,
+        "**/cpplint/*": true,
+        "**/isar_gen/*": true,
+        "**/psenv/*": true,
+        "**/meta/*": true,
+        "**/lom/*": true
+    },
+    "debug.console.fontSize": 16,
+    "terminal.integrated.fontSize": 16,
+    "window.title": "${dirty}${activeEditorLong}",
+    "window.zoomLevel": 1,
+    "editor.selectionHighlight": false,
+    "textmarker.enableWholeMatch": true,
+    "textmarker.defaultHighlightOpacity": 1,
+	"textmarker.autoSelectDistinctiveTextColor": true,
+    "textmarker.highlightColors": [
+        "rgba(0, 255, 255, 1)",
+        "rgba(0, 255, 0, 1)",
+        "rgba(255, 255, 0, 1)",
+        "rgba(255, 102, 204, 1)",
+        "rgba(255, 80, 80, 1)",
+        "rgba(153, 102, 51, 1)",
+        "rgba(130, 11, 184, 1)"
+    ],
+    "editor.occurrencesHighlight": false,
+    "editor.minimap.enabled": false
+}
