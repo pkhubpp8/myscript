@@ -1,7 +1,9 @@
 set tabstop=4   "tab等于4空格
 set incsearch   "实时搜索
 set hls			"高亮搜索
-set expandtab   "输入tab自动替换为空格。:%retab!替换当前文件的所有tab为4空格。写makefile时需注意设置set noexpandtab
+if &filetype != 'make'
+    set expandtab   "输入tab自动替换为空格。:%retab!替换当前文件的所有tab为4空格。写makefile时需注意设置set noexpandtab
+endif
 set ic          "忽略大小写
 set nu          "显示行号
 set noswapfile  "没有交换文件
@@ -12,8 +14,14 @@ set laststatus=2     "显示状态栏
 set statusline=[%n][%F][%l/%L\ %c][hex=%B]
 set scrolloff=3    "距离3行时就开始滚动
 "set mouse=a "鼠标
-syntax on
-set shell=/bin/bash\ --login
+"syntax on
+
+if $SHELL == '/bin/bash'
+    set shell=/bin/bash\ --login
+    "set shell=/bin/bash
+else
+    set shell=/home/nzhou/.local/bin/zsh
+endif
 set t_Co=256
 hi Search term=reverse ctermfg=154 ctermbg=8 guibg=#808080 guifg=#af00ff
 hi Visual term=reverse ctermfg=0 ctermbg=15 guibg=#ffffff guifg=#000000
@@ -24,7 +32,7 @@ highlight Comment ctermfg=lightblue
 
 match Todo /\vREADME:/
 match Error /\s\+$/
-autocmd FileType c,cpp,python,vim,javascript autocmd BufWritePre <buffer> :%s/\s\+$//e
+autocmd FileType c,cpp,python,vim,javascript,sh autocmd BufWritePre <buffer> :%s/\s\+$//e
 
 "打开文件回到上次位置
 if has("autocmd")
@@ -40,7 +48,6 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'           " 插件管理
 Plugin 'Valloric/YouCompleteMe'         " ycm
 Plugin 'kien/ctrlp.vim'                 " 文件搜索，ctrl+p
-Plugin 'Yggdroot/LeaderF'               " 模糊搜索，替代ctrlp
 Plugin 'inkarkat/vim-ingo-library'      "
 Plugin 'inkarkat/vim-mark'              " dependent on vim-ingo-library. 多颜色高亮，mark插件增强版
 Plugin 'luochen1990/rainbow'            " 彩虹括号
@@ -126,25 +133,27 @@ autocmd BufNewFile * normal G
 nnoremap <leader>r :call RunFile() <CR>
 func! RunFile()
     exec "wa"
+    let icvalue = &l:ic
+    set noic
+    let fullpath = expand("%:p")
+    let filename = expand("%:t")
+
     if &filetype == 'vim'
         echo "please source manually!"
     elseif &filetype == 'javascript'
-        let icvalue = &l:ic
-        set noic
-        let fullpath = expand("%:p")
-        let matchp = match(fullpath, '\v(siteoam|racoam|nodeoam|oamagentjs|fault-manager)\/\1\/test\/.*(Test|Mocha)\.js$')
-        if icvalue == 1
-            set ic
-        else
-            set noic
-        endif
-        if matchp < 0
-            exec "!node %"
-        else
-            exec "!./node_modules/.bin/mocha %"
-        endif
+        exec "!node %"
+    elseif &filetype == 'cpp'
+        exec '!g++ % -o "'.filename.'.out" && ./"'.filename.'".out && rm ./"'.filename.'".out'
+    elseif &filetype == 'c'
+        exec '!gcc % -o "'.filename.'.out" && ./"'.filename.'".out && rm ./"'.filename.'".out'
     elseif &filetype == 'go'
         exec "GoRun"
+    endif
+
+    if icvalue == 1
+        set ic
+    else
+        set noic
     endif
     return
 endfunc
@@ -158,6 +167,17 @@ func! RunEslint()
         echo "no eslint for this file"
     endif
 endfunc
+
+nnoremap <leader>d :call SwitchFFtoDos() <CR>
+func! SwitchFFtoDos()
+    if &fileformat == 'dos'
+        "reopen the current file and set fileformat to unix
+        exec "ed ++ff=unix %"
+    else
+        exec "ed ++ff=dos %"
+    endif
+endfunc
+
 
 let mapleader=","
 ",q 取消高亮
@@ -195,13 +215,14 @@ let g:Lf_WildIgnore = {
 
 "ctrlp
 "让ctrlp使用ag, leaderf重复了
-let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+" let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
-"好像不需要这些映射
-imap <A-j> <Down>
-imap <A-k> <Up>
-imap <A-h> <Left>
-imap <A-l> <Right>
+"好像默认支持 windows下可以使用ahk代替
+"imap <A-j> <Down>
+"imap <A-k> <Up>
+"imap <A-h> <Left>
+"imap <A-l> <Right>
+
 "source ~/.vim/force.vim
 
 "cscope
@@ -247,6 +268,7 @@ function! Switchhlsyn()
         echo "input error"
     endif
 endfunction
+nnoremap <F9> :call Offhlsyn()<CR>
 
 
 "search list
@@ -256,6 +278,7 @@ function! FindAll()
     call inputrestore()
     execute 'vimgrep "'.p.'" % |copen'
 endfunction
+nnoremap <F8> :call FindAll()<CR>
 
 
 if &term =~ '256color'
@@ -289,7 +312,7 @@ noremap <leader>9 9gt
 noremap <leader>0 :tablast<cr>
 hi TabLineSel   ctermfg=White  ctermbg=Blue cterm=NONE
 
-" $ 好麻烦啊
+" $需要两个按键 改成0边上的9
 map 9 $
 
 
